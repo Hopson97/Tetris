@@ -47,7 +47,6 @@ class Array2D
   private:
     size_t index(int x, int y)
     {
-        // TODO why returning 0 set the whole array?
         return (y * WIDTH + x) * PerData;
     }
 

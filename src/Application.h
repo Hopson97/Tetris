@@ -53,6 +53,7 @@ class Application
     void on_render(sf::RenderWindow& window);
 
   private:
+    bool active_block_can_move_to(const sf::Vector2i& offset);
     Array2D<int32_t> board_;
 
     ActiveBlock active_block_;
@@ -60,4 +61,5 @@ class Application
     sf::RectangleShape sprite_;
 
     sf::Clock block_move_timer_;
+    sf::Clock input_delay_;
 };

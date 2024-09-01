@@ -23,62 +23,60 @@ void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
                 case sf::Keyboard::W:
                     // rotate
                     break;
-
-                case sf::Keyboard::A:
-                case sf::Keyboard::Left:
-                    if (active_block_.location.x > 0)
-                    {
-                        active_block_.location.x--;
-                    }
-                    break;
-
-                case sf::Keyboard::D:
-                case sf::Keyboard::Right:
-                    if (active_block_.location.x <  BOARD_WIDTH-1)
-                    {
-                        active_block_.location.x++;
-                    }
-                    break;
             }
     }
 }
 
 void Application::on_update(const Keyboard& keyboard, sf::Time dt)
 {
-    if (block_move_timer_.getElapsedTime() > sf::seconds(0.2f))
+    // Handle left-right block move inputs
+    auto delay_ok = input_delay_.getElapsedTime() > sf::seconds(0.1f);
+    if ((keyboard.is_key_down(sf::Keyboard::A) || keyboard.is_key_down(sf::Keyboard::Left)) &&
+        delay_ok)
     {
-        active_block_.location.y++;
-        block_move_timer_.restart();
-
-        // Check for board collision
-        bool reset_block = false;
-        active_block_.for_each(
-            [&](int32_t square, const sf::Vector2i& location)
-            {
-                if (reset_block)
-                    return;
-
-                if (square > 0 && location.y == BOARD_HEIGHT - 1)
-                {
-                    active_block_.for_each(
-                        [&](int32_t square, const sf::Vector2i& location)
-                        {
-                            if (square > 0)
-                            {
-                                board_.set(location.x, location.y, square);
-                                std::cout << "Setting " << location << " to " << (int)square
-                                          << '\n';
-                            }
-                        });
-                    reset_block = true;
-                }
-            });
-
-        if (reset_block)
+        if (active_block_can_move_to({-1, 0}))
         {
-            std::cout << "Reset the block...\n";
+            active_block_.location.x--;
+            input_delay_.restart();
+        }
+    }
+    else if ((keyboard.is_key_down(sf::Keyboard::D) || keyboard.is_key_down(sf::Keyboard::Right)) &&
+             delay_ok)
+    {
+        if (active_block_can_move_to({1, 0}))
+        {
+            active_block_.location.x++;
+            input_delay_.restart();
+        }
+    }
+
+    // Move faster if "down" pressed
+    sf::Time move_down_delay = sf::seconds(0.4f);
+    if (keyboard.is_key_down(sf::Keyboard::S) || keyboard.is_key_down(sf::Keyboard::Down))
+    {
+        move_down_delay = sf::seconds(0.1f);
+    }
+
+    // Try to move the block down
+    if (block_move_timer_.getElapsedTime() > move_down_delay)
+    {
+        if (!active_block_can_move_to({0, 1}))
+        {
+            active_block_.for_each(
+                [&](int32_t square, const sf::Vector2i& location)
+                {
+                    if (square > 0)
+                    {
+                        board_.set(location.x, location.y, square);
+                    }
+                });
             active_block_.reset(BLOCK_SQUARE);
         }
+        else
+        {
+            active_block_.location.y++;
+        }
+        block_move_timer_.restart();
     }
 }
 
@@ -119,4 +117,28 @@ void Application::on_render(sf::RenderWindow& window)
                 window.draw(sprite_);
             }
         });
+}
+
+bool Application::active_block_can_move_to(const sf::Vector2i& offset)
+{
+    bool can_move = true;
+
+    active_block_.for_each(
+        [&](int32_t square, const sf::Vector2i& location)
+        {
+            if (!can_move || !square)
+            {
+                return;
+            }
+            auto new_position = offset + location;
+
+            // Check for out of bounds and already placed block collisions
+            if (new_position.x >= BOARD_WIDTH || new_position.x < 0 ||
+                new_position.y >= BOARD_HEIGHT || board_.get(new_position.x, new_position.y))
+            {
+                can_move = false;
+                return;
+            }
+        });
+    return can_move;
 }
