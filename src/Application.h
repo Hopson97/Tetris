@@ -20,11 +20,7 @@ struct ActiveBlock
     sf::Vector2i location;
     Block block = BLOCK_NONE;
 
-    void reset(Block new_block)
-    {
-        block = new_block;
-        location = {0, 0};
-    }
+    void reset(Block new_block);
 
     template <typename F>
     void for_each(F callback)

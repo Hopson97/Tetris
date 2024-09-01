@@ -1,11 +1,21 @@
 #include "Application.h"
+
+#include <iostream>
+
 #include "Util/Keyboard.h"
 #include "Util/Util.h"
-#include <iostream>
+
+void ActiveBlock::reset(Block new_block)
+{
+    block = new_block;
+    location = {0, 0};
+}
+
 
 Application::Application()
     : board_(BOARD_WIDTH, BOARD_HEIGHT)
 {
+    srand(std::time(nullptr));
     board_.fill(0);
     sprite_.setOutlineColor(sf::Color::White);
     sprite_.setOutlineThickness(1);
@@ -70,7 +80,7 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
                         board_.set(location.x, location.y, square);
                     }
                 });
-            active_block_.reset(BLOCK_SQUARE);
+            active_block_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
         }
         else
         {
@@ -96,24 +106,25 @@ void Application::on_render(sf::RenderWindow& window)
     {
         for (int x = 0; x < BOARD_WIDTH; x++)
         {
-            if (board_.get(x, y) > 0)
+            auto square = board_.get(x, y);
+            if (square > 0)
             {
+                sprite_.setFillColor(get_block_colour(square));
                 sprite_.setPosition(x * SQUARE_SIZE + BOARD_X, y * SQUARE_SIZE + BOARD_Y);
-                sprite_.setFillColor(sf::Color::Red);
                 window.draw(sprite_);
             }
         }
     }
 
-    // Draw the blocc
+    // Draw the active block
     active_block_.for_each(
         [&](int32_t square, const sf::Vector2i& location)
         {
             if (square > 0)
             {
+                sprite_.setFillColor(get_block_colour(square));
                 sprite_.setPosition(location.x * SQUARE_SIZE + BOARD_X,
                                     location.y * SQUARE_SIZE + BOARD_Y);
-                sprite_.setFillColor(sf::Color::Red);
                 window.draw(sprite_);
             }
         });
