@@ -99,6 +99,33 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
                         board_.set(location.x, location.y, square);
                     }
                 });
+
+            // Check columns for a clearance
+            for (int y = 0; y < BOARD_HEIGHT; y++)
+            {
+                bool clear = true;
+                for (int x = 0; x < BOARD_WIDTH; x++)
+                {
+                    if (!board_.get(x, y))
+                    {
+                        clear = false;
+                        break;
+                    }
+                }
+
+                if (clear)
+                {
+                    for (int clear_y = y; clear_y > 0; clear_y--)
+                    {
+                        for (int x = 0; x < BOARD_WIDTH; x++)
+                        {
+                            board_.set(x, clear_y, board_.get(x, clear_y - 1));
+                        }
+                    }
+                }
+            }
+
+
             active_block_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
         }
         else
