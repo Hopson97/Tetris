@@ -1,4 +1,8 @@
-# SFML Template
+# Tetris
+
+## Asset Credits
+
+Font https://www.dafont.com/font-comment.php?file=amity_jack
 
 ## Building and Running
 

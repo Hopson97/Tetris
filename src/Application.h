@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 
@@ -30,4 +32,7 @@ class Application
 
     sf::Clock block_move_timer_;
     sf::Clock input_delay_;
+
+    sf::Font font_;
+    sf::Text text_;
 };

@@ -14,6 +14,9 @@ Application::Application()
 
     active_block_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
     next_preview_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
+
+    font_.loadFromFile("assets/Amity_Jack.ttf");
+    text_.setFont(font_);
 }
 
 void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
@@ -123,10 +126,20 @@ void Application::on_fixed_update(sf::Time dt)
 
 void Application::on_render(sf::RenderWindow& window)
 {
+    // Render the board outline
     sprite_.setFillColor(sf::Color::Black);
     sprite_.setPosition(BOARD_X, BOARD_Y);
     sprite_.setSize({SQUARE_SIZE * BOARD_WIDTH, SQUARE_SIZE * BOARD_HEIGHT});
     window.draw(sprite_);
+
+    // Render the preview outline and text
+    sprite_.setPosition({PREVIEW_BOARD_X, PREVIEW_BOARD_Y});
+    sprite_.setSize({SQUARE_SIZE * 6, SQUARE_SIZE * 6});
+    window.draw(sprite_);
+
+    text_.setString("Next Block");
+    text_.setPosition({PREVIEW_BOARD_X + SQUARE_SIZE * 3 - text_.getLocalBounds().getSize().x / 2, PREVIEW_BOARD_Y});
+    window.draw(text_);
 
     sprite_.setSize({SQUARE_SIZE, SQUARE_SIZE});
     for (int y = 0; y < BOARD_HEIGHT; y++)
@@ -144,7 +157,8 @@ void Application::on_render(sf::RenderWindow& window)
     }
 
     active_block_.draw(window, sprite_, {BOARD_X, BOARD_Y});
-    next_preview_.draw(window, sprite_, {BOARD_X * 2, BOARD_Y});
+    next_preview_.draw(window, sprite_,
+                       {PREVIEW_BOARD_X + SQUARE_SIZE, PREVIEW_BOARD_Y + SQUARE_SIZE * 2});
 }
 
 bool Application::block_can_move(const ActiveBlock& block, const sf::Vector2i& offset)
