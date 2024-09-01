@@ -1,29 +1,8 @@
 #include "Application.h"
 
-#include <algorithm>
-#include <iostream>
-
+#include "Constants.h"
 #include "Util/Keyboard.h"
 #include "Util/Util.h"
-
-ActiveBlock ActiveBlock::rotate()
-{
-    ActiveBlock b = *this;
-
-    // From https://stackoverflow.com/a/22858585
-    int size = block.size;
-    for (int i = 0; i < size; ++i)
-        for (int j = 0; j < size; ++j)
-            b.block.layout[(size - 1 - i) + j * size] = block.layout[i * size + j];
-
-    return b;
-}
-
-void ActiveBlock::reset(Block new_block)
-{
-    block = new_block;
-    location = {0, 0};
-}
 
 Application::Application()
     : board_(BOARD_WIDTH, BOARD_HEIGHT)
@@ -33,7 +12,8 @@ Application::Application()
     sprite_.setOutlineColor(sf::Color::White);
     sprite_.setOutlineThickness(1);
 
-    active_block_.reset(BLOCK_I);
+    active_block_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
+    next_preview_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
 }
 
 void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
@@ -125,8 +105,9 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
                 }
             }
 
-
-            active_block_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
+            // Reset the active block
+            active_block_ = next_preview_;
+            next_preview_.reset(ALL_BLOCKS[rand() % ALL_BLOCKS.size()]);
         }
         else
         {
@@ -162,18 +143,8 @@ void Application::on_render(sf::RenderWindow& window)
         }
     }
 
-    // Draw the active block
-    active_block_.for_each(
-        [&](int32_t square, const sf::Vector2i& location)
-        {
-            if (square > 0)
-            {
-                sprite_.setFillColor(get_block_colour(square));
-                sprite_.setPosition(location.x * SQUARE_SIZE + BOARD_X,
-                                    location.y * SQUARE_SIZE + BOARD_Y);
-                window.draw(sprite_);
-            }
-        });
+    active_block_.draw(window, sprite_, {BOARD_X, BOARD_Y});
+    next_preview_.draw(window, sprite_, {BOARD_X * 2, BOARD_Y});
 }
 
 bool Application::block_can_move(const ActiveBlock& block, const sf::Vector2i& offset)

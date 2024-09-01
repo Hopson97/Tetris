@@ -150,9 +150,12 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="deps\imgui_sfml\imgui-SFML.cpp" />
+    <ClCompile Include="src\Blocks.cpp" />
+    <ClCompile Include="src\Constants.h" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Util\Keyboard.cpp" />
     <ClCompile Include="src\Util\Profiler.cpp" />
+    <ClCompile Include="src\Util\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />

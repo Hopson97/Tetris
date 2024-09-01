@@ -9,36 +9,6 @@
 
 class Keyboard;
 
-constexpr float SQUARE_SIZE = 32;
-constexpr auto BOARD_WIDTH = 20;
-constexpr auto BOARD_HEIGHT = 25;
-constexpr auto BOARD_X = 800 - (BOARD_WIDTH * SQUARE_SIZE / 2);
-constexpr auto BOARD_Y = 450 - (BOARD_HEIGHT * SQUARE_SIZE / 2);
-
-struct ActiveBlock
-{
-    sf::Vector2i location;
-    Block block = BLOCK_NONE;
-
-    ActiveBlock rotate();
-    void reset(Block new_block);
-
-    template <typename F>
-    void for_each(F callback) const
-    {
-        for (int y = 0; y < block.size; y++)
-        {
-            for (int x = 0; x < block.size; x++)
-            {
-                auto tile = block.get(x, y);
-                auto board_x = x + location.x;
-                auto board_y = y + location.y;
-                callback(tile, sf::Vector2i{board_x, board_y});
-            }
-        }
-    }
-};
-
 class Application
 {
   public:
@@ -54,6 +24,7 @@ class Application
     Array2D<int32_t> board_;
 
     ActiveBlock active_block_;
+    ActiveBlock next_preview_;
 
     sf::RectangleShape sprite_;
 
