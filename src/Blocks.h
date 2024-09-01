@@ -16,7 +16,6 @@ struct Block
 // Empty default block
 const Block BLOCK_NONE{0, {}};
 
-
 /// Represents a block with a given position on the board
 struct ActiveBlock
 {
@@ -41,9 +40,9 @@ struct ActiveBlock
         }
     }
 
-    void draw(sf::RenderTarget& renderer, sf::RectangleShape& sprite, const sf::Vector2f& board_offset);
+    void draw(sf::RenderTarget& renderer, sf::RectangleShape& sprite,
+              const sf::Vector2f& board_offset);
 };
-
 
 // clang-format off
 const Block BLOCK_SQUARE  {
@@ -121,8 +120,8 @@ const Block BLOCK_O  {
 // clang-format on
 
 const std::vector<sf::Color> BLOCK_COLOURS = {
-    sf::Color::Yellow, sf::Color::Green, sf::Color::Blue,
-    sf::Color::Cyan,   sf::Color::Red,   sf::Color::Black,
+    sf::Color::Yellow, sf::Color::Green, sf::Color::Blue, sf::Color::Cyan,
+    sf::Color::Red,    {249, 145, 8},    {153, 246, 253}, {117, 185, 39},
 };
 
 const std::vector<Block> ALL_BLOCKS{BLOCK_SQUARE, BLOCK_I, BLOCK_T, BLOCK_S,
