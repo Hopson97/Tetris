@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <ranges>
 #include <vector>
 
 // Fixed size std::vector with 2D access
@@ -38,10 +39,16 @@ class Array2D
         return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
     }
 
-  private:
-    unsigned index(int x, int y)
+    void fill(const T& value)
     {
-        return data_[(y * WIDTH + x) * PerData];
+        std::ranges::fill(data_, value);
+    }
+
+  private:
+    size_t index(int x, int y)
+    {
+        // TODO why returning 0 set the whole array?
+        return (y * WIDTH + x) * PerData;
     }
 
   private:

@@ -1,38 +1,78 @@
 #include "Application.h"
-
 #include "Util/Keyboard.h"
+#include <iostream>
+#include "Util/Util.h"
 
 Application::Application()
+    : board_(BOARD_WIDTH, BOARD_HEIGHT)
 {
-    sprite_.setSize({64.0f, 64.0f});
+    board_.fill(0);
+    sprite_.setOutlineColor(sf::Color::White);
+    sprite_.setOutlineThickness(1);
+
+    active_block_.reset(BLOCK_I);
 }
 
 void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
 {
+    switch (e.type)
+    {
+        case sf::Event::KeyReleased:
+            switch (e.key.code)
+            {
+                case sf::Keyboard::W:
+                    // rotate
+                    break;
+
+                case sf::Keyboard::A:
+                case sf::Keyboard::Left:
+                    break;
+
+                case sf::Keyboard::D:
+                case sf::Keyboard::Right:
+                    break;
+            }
+    }
 }
 
 void Application::on_update(const Keyboard& keyboard, sf::Time dt)
 {
-    constexpr static float SPEED = 100.0f;
-    sf::Vector2f move;
-    if (keyboard.is_key_down(sf::Keyboard::W))
+    if (block_move_timer_.getElapsedTime() > sf::seconds(0.2f))
     {
-        move.y -= SPEED;
+        active_block_.location.y++;
+        block_move_timer_.restart();
+
+        // Check for board collision
+        bool reset_block = false;
+        active_block_.for_each(
+            [&](int32_t square, const sf::Vector2i& location)
+            {
+                if (reset_block)
+                    return;
+
+                if (square > 0 && location.y == BOARD_HEIGHT - 1)
+                {
+                    print_board();
+                    active_block_.for_each(
+                        [&](int32_t square, const sf::Vector2i& location)
+                        {
+                            if (square > 0)
+                            {
+                                board_.set(location.x, location.y, square);
+                                std::cout << "Setting " << location << " to " << (int)square << '\n';
+                                print_board();
+                            }
+                        });
+                    reset_block = true;
+                }
+            });
+
+        if (reset_block)
+        {
+            std::cout << "Reset the block...\n";
+            active_block_.reset(BLOCK_SQUARE);
+        }
     }
-    else if (keyboard.is_key_down(sf::Keyboard::S))
-    {
-        move.y += SPEED;
-    }
-    if (keyboard.is_key_down(sf::Keyboard::A))
-    {
-        move.x -= SPEED;
-    }
-    else if (keyboard.is_key_down(sf::Keyboard::D))
-    {
-        move.x += SPEED;
-    }
-    move *= dt.asSeconds();
-    sprite_.move(move);
 }
 
 void Application::on_fixed_update(sf::Time dt)
@@ -41,5 +81,48 @@ void Application::on_fixed_update(sf::Time dt)
 
 void Application::on_render(sf::RenderWindow& window)
 {
+    sprite_.setFillColor(sf::Color::Black);
+    sprite_.setPosition(BOARD_X, BOARD_Y);
+    sprite_.setSize({SQUARE_SIZE * BOARD_WIDTH, SQUARE_SIZE * BOARD_HEIGHT});
     window.draw(sprite_);
+
+    sprite_.setSize({SQUARE_SIZE, SQUARE_SIZE});
+    for (int y = 0; y < BOARD_HEIGHT; y++)
+    {
+        for (int x = 0; x < BOARD_WIDTH; x++)
+        {
+            if (board_.get(x, y) > 0)
+            {
+                sprite_.setPosition(x * SQUARE_SIZE + BOARD_X, y * SQUARE_SIZE + BOARD_Y);
+                sprite_.setFillColor(sf::Color::Red);
+                window.draw(sprite_);
+            }
+        }
+    }
+
+    // Draw the blocc
+    active_block_.for_each(
+        [&](int32_t square, const sf::Vector2i& location)
+        {
+            if (square > 0)
+            {
+                sprite_.setPosition(location.x * SQUARE_SIZE + BOARD_X,
+                                    location.y * SQUARE_SIZE + BOARD_Y);
+                sprite_.setFillColor(sf::Color::Red);
+                window.draw(sprite_);
+            }
+        });
+}
+
+void Application::print_board()
+{
+    for (int y = 0; y < BOARD_HEIGHT; y++)
+    {
+        for (int x = 0; x < BOARD_WIDTH; x++)
+        {
+            std::cout << (int)board_.get(x, y) << ' ';
+        }
+        std::cout << '\n';
+    }
+    std::cout << "\n";
 }

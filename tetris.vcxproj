@@ -175,6 +175,7 @@
     <ClInclude Include="deps\imgui_sfml\imconfig-SFML.h" />
     <ClInclude Include="deps\imgui_sfml\imgui-SFML.h" />
     <ClInclude Include="deps\imgui_sfml\imgui-SFML_export.h" />
+    <ClInclude Include="src\Blocks.h" />
     <ClInclude Include="src\Util\Array2D.h" />
     <ClInclude Include="src\Util\Keyboard.h" />
     <ClInclude Include="src\Util\Profiler.h" />
