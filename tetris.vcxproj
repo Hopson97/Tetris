@@ -155,7 +155,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Util\Keyboard.cpp" />
     <ClCompile Include="src\Util\Profiler.cpp" />
-    <ClCompile Include="src\Util\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -182,8 +181,6 @@
     <ClInclude Include="src\Util\Array2D.h" />
     <ClInclude Include="src\Util\Keyboard.h" />
     <ClInclude Include="src\Util\Profiler.h" />
-    <ClInclude Include="src\Util\TimeStep.h" />
-    <ClInclude Include="src\Util\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

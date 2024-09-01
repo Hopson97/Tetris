@@ -2,7 +2,6 @@
 
 #include "Constants.h"
 #include "Util/Keyboard.h"
-#include "Util/Util.h"
 
 Application::Application()
     : board_(BOARD_WIDTH, BOARD_HEIGHT)
@@ -96,6 +95,7 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
                     }
                 }
 
+                // Propagate upwards, moving all blocks down
                 if (clear)
                 {
                     for (int clear_y = y; clear_y > 0; clear_y--)
@@ -120,10 +120,6 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
     }
 }
 
-void Application::on_fixed_update(sf::Time dt)
-{
-}
-
 void Application::on_render(sf::RenderWindow& window)
 {
     // Render the board outline
@@ -137,10 +133,12 @@ void Application::on_render(sf::RenderWindow& window)
     sprite_.setSize({SQUARE_SIZE * 6, SQUARE_SIZE * 6});
     window.draw(sprite_);
 
+    // The text
     text_.setString("Next Block");
     text_.setPosition({PREVIEW_BOARD_X + SQUARE_SIZE * 3 - text_.getLocalBounds().getSize().x / 2, PREVIEW_BOARD_Y});
     window.draw(text_);
 
+    // Render the board itself
     sprite_.setSize({SQUARE_SIZE, SQUARE_SIZE});
     for (int y = 0; y < BOARD_HEIGHT; y++)
     {
@@ -155,7 +153,8 @@ void Application::on_render(sf::RenderWindow& window)
             }
         }
     }
-
+        
+    // Render the block being currently moved and the next block preview
     active_block_.draw(window, sprite_, {BOARD_X, BOARD_Y});
     next_preview_.draw(window, sprite_,
                        {PREVIEW_BOARD_X + SQUARE_SIZE, PREVIEW_BOARD_Y + SQUARE_SIZE * 2});

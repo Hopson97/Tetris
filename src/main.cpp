@@ -11,7 +11,6 @@
 #include "Util/Array2D.h"
 #include "Util/Keyboard.h"
 #include "Util/Profiler.h"
-#include "Util/TimeStep.h"
 
 namespace
 {
@@ -30,7 +29,6 @@ int main()
         return EXIT_FAILURE;
     }
 
-    TimeStep fixed_updater{50};
     Profiler profiler;
     bool show_profiler = false;
 
@@ -59,12 +57,6 @@ int main()
             update_profiler.end_section();
         }
 
-        // Fixed-rate update
-        {
-            auto& fixed_update_profiler = profiler.begin_section("Fixed Update");
-            fixed_updater.update([&](sf::Time dt) { app.on_fixed_update(dt); });
-            fixed_update_profiler.end_section();
-        }
         // Render
         window.clear();
         {
