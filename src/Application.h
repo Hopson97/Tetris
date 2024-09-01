@@ -9,7 +9,7 @@
 
 class Keyboard;
 
-constexpr float SQUARE_SIZE = 32;
+constexpr float SQUARE_SIZE = 16;
 constexpr size_t BOARD_WIDTH = 20;
 constexpr size_t BOARD_HEIGHT = 20;
 constexpr size_t BOARD_X = 20;
@@ -51,8 +51,6 @@ class Application
     void on_update(const Keyboard& keyboard, sf::Time dt);
     void on_fixed_update(sf::Time dt);
     void on_render(sf::RenderWindow& window);
-
-    void print_board();
 
   private:
     Array2D<int32_t> board_;

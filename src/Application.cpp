@@ -1,7 +1,7 @@
 #include "Application.h"
 #include "Util/Keyboard.h"
-#include <iostream>
 #include "Util/Util.h"
+#include <iostream>
 
 Application::Application()
     : board_(BOARD_WIDTH, BOARD_HEIGHT)
@@ -26,10 +26,18 @@ void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
 
                 case sf::Keyboard::A:
                 case sf::Keyboard::Left:
+                    if (active_block_.location.x > 0)
+                    {
+                        active_block_.location.x--;
+                    }
                     break;
 
                 case sf::Keyboard::D:
                 case sf::Keyboard::Right:
+                    if (active_block_.location.x <  BOARD_WIDTH-1)
+                    {
+                        active_block_.location.x++;
+                    }
                     break;
             }
     }
@@ -52,15 +60,14 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
 
                 if (square > 0 && location.y == BOARD_HEIGHT - 1)
                 {
-                    print_board();
                     active_block_.for_each(
                         [&](int32_t square, const sf::Vector2i& location)
                         {
                             if (square > 0)
                             {
                                 board_.set(location.x, location.y, square);
-                                std::cout << "Setting " << location << " to " << (int)square << '\n';
-                                print_board();
+                                std::cout << "Setting " << location << " to " << (int)square
+                                          << '\n';
                             }
                         });
                     reset_block = true;
@@ -112,17 +119,4 @@ void Application::on_render(sf::RenderWindow& window)
                 window.draw(sprite_);
             }
         });
-}
-
-void Application::print_board()
-{
-    for (int y = 0; y < BOARD_HEIGHT; y++)
-    {
-        for (int x = 0; x < BOARD_WIDTH; x++)
-        {
-            std::cout << (int)board_.get(x, y) << ' ';
-        }
-        std::cout << '\n';
-    }
-    std::cout << "\n";
 }
