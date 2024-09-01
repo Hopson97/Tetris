@@ -8,7 +8,7 @@ struct Block
     int size;
     std::vector<int32_t> layout;
 
-    int32_t get(int x, int y)
+    int32_t get(int x, int y) const
     {
         assert(x >= 0 && x < size && y >= 0 && y < size);
         return layout[(y * size + x)];

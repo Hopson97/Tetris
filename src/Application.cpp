@@ -1,16 +1,29 @@
 #include "Application.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "Util/Keyboard.h"
 #include "Util/Util.h"
+
+ActiveBlock ActiveBlock::rotate()
+{
+    ActiveBlock b = *this;
+
+    // From https://stackoverflow.com/a/22858585
+    int size = block.size;
+    for (int i = 0; i < size; ++i)
+        for (int j = 0; j < size; ++j)
+            b.block.layout[(size - 1 - i) + j * size] = block.layout[i * size + j];
+
+    return b;
+}
 
 void ActiveBlock::reset(Block new_block)
 {
     block = new_block;
     location = {0, 0};
 }
-
 
 Application::Application()
     : board_(BOARD_WIDTH, BOARD_HEIGHT)
@@ -31,8 +44,14 @@ void Application::on_event(const sf::RenderWindow& window, const sf::Event& e)
             switch (e.key.code)
             {
                 case sf::Keyboard::W:
-                    // rotate
-                    break;
+                {
+                    auto new_block = active_block_.rotate();
+                    if (block_can_move(new_block, {0, 0}))
+                    {
+                        active_block_ = new_block;
+                    }
+                }
+                break;
             }
     }
 }
@@ -44,7 +63,7 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
     if ((keyboard.is_key_down(sf::Keyboard::A) || keyboard.is_key_down(sf::Keyboard::Left)) &&
         delay_ok)
     {
-        if (active_block_can_move_to({-1, 0}))
+        if (block_can_move(active_block_, {-1, 0}))
         {
             active_block_.location.x--;
             input_delay_.restart();
@@ -53,7 +72,7 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
     else if ((keyboard.is_key_down(sf::Keyboard::D) || keyboard.is_key_down(sf::Keyboard::Right)) &&
              delay_ok)
     {
-        if (active_block_can_move_to({1, 0}))
+        if (block_can_move(active_block_, {1, 0}))
         {
             active_block_.location.x++;
             input_delay_.restart();
@@ -70,7 +89,7 @@ void Application::on_update(const Keyboard& keyboard, sf::Time dt)
     // Try to move the block down
     if (block_move_timer_.getElapsedTime() > move_down_delay)
     {
-        if (!active_block_can_move_to({0, 1}))
+        if (!block_can_move(active_block_, {0, 1}))
         {
             active_block_.for_each(
                 [&](int32_t square, const sf::Vector2i& location)
@@ -130,11 +149,11 @@ void Application::on_render(sf::RenderWindow& window)
         });
 }
 
-bool Application::active_block_can_move_to(const sf::Vector2i& offset)
+bool Application::block_can_move(const ActiveBlock& block, const sf::Vector2i& offset)
 {
     bool can_move = true;
 
-    active_block_.for_each(
+    block.for_each(
         [&](int32_t square, const sf::Vector2i& location)
         {
             if (!can_move || !square)

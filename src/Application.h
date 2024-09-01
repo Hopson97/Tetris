@@ -20,10 +20,11 @@ struct ActiveBlock
     sf::Vector2i location;
     Block block = BLOCK_NONE;
 
+    ActiveBlock rotate();
     void reset(Block new_block);
 
     template <typename F>
-    void for_each(F callback)
+    void for_each(F callback) const
     {
         for (int y = 0; y < block.size; y++)
         {
@@ -49,7 +50,7 @@ class Application
     void on_render(sf::RenderWindow& window);
 
   private:
-    bool active_block_can_move_to(const sf::Vector2i& offset);
+    bool block_can_move(const ActiveBlock& block, const sf::Vector2i& offset);
     Array2D<int32_t> board_;
 
     ActiveBlock active_block_;
