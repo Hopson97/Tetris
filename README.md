@@ -2,6 +2,8 @@
 
 Tetris clone created using C++
 
+![clearing a row](preview/Example.gif)
+
 ## Asset Credits
 
 Font: https://www.dafont.com/font-comment.php?file=amity_jack
